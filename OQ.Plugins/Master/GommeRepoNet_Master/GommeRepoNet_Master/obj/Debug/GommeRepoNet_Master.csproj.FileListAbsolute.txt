@@ -1,8 +1,0 @@
-Z:\Adrian\Programmieren\Minecraft\Projects\gommereportbots\OQ.Plugins\Master\GommeRepoNet_Master\GommeRepoNet_Master\bin\Debug\GommeRepoNet_Master.dll
-Z:\Adrian\Programmieren\Minecraft\Projects\gommereportbots\OQ.Plugins\Master\GommeRepoNet_Master\GommeRepoNet_Master\bin\Debug\GommeRepoNet_Master.pdb
-Z:\Adrian\Programmieren\Minecraft\Projects\gommereportbots\OQ.Plugins\Master\GommeRepoNet_Master\GommeRepoNet_Master\bin\Debug\OQ.MineBot.PluginBase.dll
-Z:\Adrian\Programmieren\Minecraft\Projects\gommereportbots\OQ.Plugins\Master\GommeRepoNet_Master\GommeRepoNet_Master\obj\Debug\GommeRepoNet_Master.csprojAssemblyReference.cache
-Z:\Adrian\Programmieren\Minecraft\Projects\gommereportbots\OQ.Plugins\Master\GommeRepoNet_Master\GommeRepoNet_Master\obj\Debug\GommeRepoNet_Master.csproj.CoreCompileInputs.cache
-Z:\Adrian\Programmieren\Minecraft\Projects\gommereportbots\OQ.Plugins\Master\GommeRepoNet_Master\GommeRepoNet_Master\obj\Debug\GommeRepoNet_Master.csproj.CopyComplete
-Z:\Adrian\Programmieren\Minecraft\Projects\gommereportbots\OQ.Plugins\Master\GommeRepoNet_Master\GommeRepoNet_Master\obj\Debug\GommeRepoNet_Master.dll
-Z:\Adrian\Programmieren\Minecraft\Projects\gommereportbots\OQ.Plugins\Master\GommeRepoNet_Master\GommeRepoNet_Master\obj\Debug\GommeRepoNet_Master.pdb

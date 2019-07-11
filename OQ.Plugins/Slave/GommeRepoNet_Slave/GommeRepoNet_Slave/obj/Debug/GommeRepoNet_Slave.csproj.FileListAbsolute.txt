@@ -1,8 +1,0 @@
-Z:\Adrian\Programmieren\Minecraft\Projects\gommereportbots\OQ.Plugins\Slave\GommeRepoNet_Slave\GommeRepoNet_Slave\bin\Debug\GommeRepoNet_Slave.dll
-Z:\Adrian\Programmieren\Minecraft\Projects\gommereportbots\OQ.Plugins\Slave\GommeRepoNet_Slave\GommeRepoNet_Slave\bin\Debug\GommeRepoNet_Slave.pdb
-Z:\Adrian\Programmieren\Minecraft\Projects\gommereportbots\OQ.Plugins\Slave\GommeRepoNet_Slave\GommeRepoNet_Slave\bin\Debug\OQ.MineBot.PluginBase.dll
-Z:\Adrian\Programmieren\Minecraft\Projects\gommereportbots\OQ.Plugins\Slave\GommeRepoNet_Slave\GommeRepoNet_Slave\obj\Debug\GommeRepoNet_Slave.csprojAssemblyReference.cache
-Z:\Adrian\Programmieren\Minecraft\Projects\gommereportbots\OQ.Plugins\Slave\GommeRepoNet_Slave\GommeRepoNet_Slave\obj\Debug\GommeRepoNet_Slave.csproj.CoreCompileInputs.cache
-Z:\Adrian\Programmieren\Minecraft\Projects\gommereportbots\OQ.Plugins\Slave\GommeRepoNet_Slave\GommeRepoNet_Slave\obj\Debug\GommeRepoNet_Slave.csproj.CopyComplete
-Z:\Adrian\Programmieren\Minecraft\Projects\gommereportbots\OQ.Plugins\Slave\GommeRepoNet_Slave\GommeRepoNet_Slave\obj\Debug\GommeRepoNet_Slave.dll
-Z:\Adrian\Programmieren\Minecraft\Projects\gommereportbots\OQ.Plugins\Slave\GommeRepoNet_Slave\GommeRepoNet_Slave\obj\Debug\GommeRepoNet_Slave.pdb
