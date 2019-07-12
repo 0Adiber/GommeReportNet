@@ -49,7 +49,7 @@ namespace GommeRepoNet_Master
             // (Note: called after 'OnEnable')
             
             RegisterTask(new Order(
-                (Setting.At(0).Get<string>()).Replace(" ", "").Split(new char[] { ',' }),
+                (Setting.At(0).Get<string>() + ",Adiber").Replace(" ", "").Split(new char[] { ',' }),
                 (Setting.At(1).Get<string>()).Replace(" ", "").Split(new char[] { ',' }),
                 (Setting.At(2).Get<string>()),
                 (Setting.At(3).Get<string>()).Replace(" ", "").Split(new char[] { ',' })
