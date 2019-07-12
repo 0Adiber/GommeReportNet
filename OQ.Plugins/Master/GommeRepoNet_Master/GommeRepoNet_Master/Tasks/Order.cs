@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using OQ.MineBot.PluginBase;
 using OQ.MineBot.PluginBase.Base.Plugin.Tasks;
 using OQ.MineBot.PluginBase.Classes.Base;
+using OQ.MineBot.PluginBase.Classes;
+using OQ.MineBot.PluginBase.Classes.Entity;
 
 namespace GommeRepoNet_Master.Tasks
 {
@@ -84,13 +86,13 @@ namespace GommeRepoNet_Master.Tasks
                         return;
                     }
 
-                    int wHash = player.world.GetHashCode();    
+                    ILiving safe = player.entities.playerList.Count == 0 ? null : player.entities.playerList.First().Value;
 
                     player.functions.Chat("/clan jump " + sender);
 
                     Thread.Sleep(3000);//sleep, to make sure he joined the game server
 
-                    if(wHash.Equals(player.world.GetHashCode()))
+                    if(safe.Equals(player.entities.playerList.First().Value))
                     {
                         player.functions.Chat("/cc [GommeReportNet] Konnte dem Gameserver nicht beitreten :( - Bitte versuche es später erneut.");
                         return;
@@ -130,6 +132,7 @@ namespace GommeRepoNet_Master.Tasks
 
                 if (tempAccs.Count == 0)
                 {
+                    player.functions.Chat("/hub");
                     player.functions.Chat("/cc [GommeReportNet] " + (recY + recN) + "/" + sent + " Bots haben geantwortet.");
                     player.functions.Chat("/cc [GommeReportNet] " + recY + "/" + sent + " Bots konnten reporten.");
                     player.functions.Chat("/cc [GommeReportNet] " + recN + "/" + sent + " Bots konnten nicht reporten.");
