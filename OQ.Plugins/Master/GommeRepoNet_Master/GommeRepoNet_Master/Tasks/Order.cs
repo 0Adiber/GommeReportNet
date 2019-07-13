@@ -86,16 +86,19 @@ namespace GommeRepoNet_Master.Tasks
                         return;
                     }
 
-                    string safe = player.entities.uuidList.Count() < 1 ? "none" : player.entities.uuidList.First().Value.ToString();
+                    ILiving safe = player.entities.playerList.IsEmpty ? null : player.entities.playerList.First().Value;
 
                     player.functions.Chat("/clan jump " + sender);
 
                     Thread.Sleep(2000);//sleep, to make sure he joined the game server
 
-                    string current = player.entities.uuidList.Count() < 1 ? "none" : player.entities.uuidList.First().Value.ToString();
+                    ILiving current = player.entities.playerList.IsEmpty ? null : player.entities.playerList.First().Value;
 
                     if (safe.Equals(current))
                     {
+                        player.functions.Chat("Safe:" + safe.ToString());
+                        player.functions.Chat("Current:" + current.ToString());
+
                         player.functions.Chat("/cc [GommeReportNet] Konnte dem Gameserver nicht beitreten :( - Bitte versuche es später erneut.");
                         return;
                     }
