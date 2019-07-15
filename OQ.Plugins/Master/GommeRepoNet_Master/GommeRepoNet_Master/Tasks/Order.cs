@@ -8,6 +8,7 @@ using OQ.MineBot.PluginBase.Base.Plugin.Tasks;
 using OQ.MineBot.PluginBase.Classes.Base;
 using OQ.MineBot.PluginBase.Classes;
 using OQ.MineBot.PluginBase.Classes.Entity;
+using OQ.MineBot.Protocols.Classes.Base;
 
 namespace GommeRepoNet_Master.Tasks
 {
@@ -59,12 +60,12 @@ namespace GommeRepoNet_Master.Tasks
                 //check if the reporter is authorised and get the person to report
                 for (int i = 0; i < authorised.Length; i++)
                 {
-                    if (!parts[0].Contains(authorised[i])) continue;
+                    if (!parts[0].ToLower().Contains(authorised[i])) continue;
                     sender = authorised[i];
                     for (int j = 0; j < keys.Length; j++)
                     {
-                        if (!parts[1].Trim().Contains(keys[j])) continue;
-                        com = parts[1].Trim().Split(new char[] { ' ' })[1];
+                        if (!parts[1].Trim().ToLower().Contains(keys[j])) continue;
+                        com = parts[1].Trim().ToLower().Split(new char[] { ' ' })[1];
                         break;
                     }
                 }
@@ -86,22 +87,18 @@ namespace GommeRepoNet_Master.Tasks
                         return;
                     }
 
-                    ILiving safe = player.entities.playerList.IsEmpty ? null : player.entities.playerList.First().Value;
-
                     player.functions.Chat("/clan jump " + sender);
 
-                    Thread.Sleep(2000);//sleep, to make sure he joined the game server
+                    Thread.Sleep(2000);//sleep, to make sure he joined the game serve
 
-                    ILiving current = player.entities.playerList.IsEmpty ? null : player.entities.playerList.First().Value;
+                    //if (1 == 2)
+                    //{
+                    //    player.functions.Chat("/cc Safe:" + safe.ToString());
+                    //    player.functions.Chat("/cc Current:" + current.ToString());
 
-                    if (safe.Equals(current))
-                    {
-                        player.functions.Chat("Safe:" + safe.ToString());
-                        player.functions.Chat("Current:" + current.ToString());
-
-                        player.functions.Chat("/cc [GommeReportNet] Konnte dem Gameserver nicht beitreten :( - Bitte versuche es später erneut.");
-                        return;
-                    }
+                    //    player.functions.Chat("/cc [GommeReportNet] Konnte dem Gameserver nicht beitreten :( - Bitte versuche es später erneut.");
+                    //    return;
+                    //}
 
                     player.functions.Chat("/" + cmd.Replace("%to_report%", com));
                     sent = 0;
@@ -109,7 +106,7 @@ namespace GommeRepoNet_Master.Tasks
                     recN = 0;
 
                     tempAccs.Clear();
-                    tempAccs.AddRange(accounts);
+                    tempAccs = new List<string>(accounts);
 
                     command = cmd;
                     badGuy = com;
@@ -130,9 +127,6 @@ namespace GommeRepoNet_Master.Tasks
                 if (msg.Trim().Equals("no"))
                 {
                     recN++;
-                } else
-                {
-                    return;
                 }
 
                 if (tempAccs.Count == 0)
@@ -143,8 +137,8 @@ namespace GommeRepoNet_Master.Tasks
                     player.functions.Chat("/cc [GommeReportNet] " + recN + "/" + sent + " Bots konnten nicht reporten.");
 
                     waiting = false;
+                    return;
                 }
-
                 sendReport(player, command, badGuy, tempAccs.ElementAt(0));
             }
         }

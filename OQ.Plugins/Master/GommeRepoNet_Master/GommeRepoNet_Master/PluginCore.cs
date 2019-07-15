@@ -20,7 +20,7 @@ namespace GommeRepoNet_Master
             this.Setting.Add(new StringSetting("Bots", "Accounts separated by comma", ""));
                 this.Setting.Add(new StringSetting("Trigger Keywords", "Keywords the bot should react to (e.g. 'report'). (split with comma)", "report"));
                 this.Setting.Add(new StringSetting("Command", "Command the bot should execute when triggered", "report %to_report% hacking confirm"));
-            this.Setting.Add(new StringSetting("Authorized Users", "Users that are allowed to use this Plugin by the Chat command", "Adiber,MrHuhn"));
+            this.Setting.Add(new StringSetting("Authorised Users", "Users that are allowed to use this Plugin by the Chat command", "Adiber,MrHuhn"));
 
         }
 
@@ -31,7 +31,7 @@ namespace GommeRepoNet_Master
             if (string.IsNullOrWhiteSpace(Setting.At(0).Get<string>())) return new PluginResponse(false, "Bot Accounts not set.");
             if (string.IsNullOrWhiteSpace(Setting.At(1).Get<string>())) return new PluginResponse(false, "Trigger Keywords not set.");
             if (string.IsNullOrWhiteSpace(Setting.At(2).Get<string>())) return new PluginResponse(false, "Command not set.");
-            if (string.IsNullOrWhiteSpace(Setting.At(3).Get<string>())) return new PluginResponse(false, "Command not set.");
+            if (string.IsNullOrWhiteSpace(Setting.At(3).Get<string>())) return new PluginResponse(false, "Authorised Useres not set.");
 
             return new PluginResponse(true);
         }
@@ -49,10 +49,10 @@ namespace GommeRepoNet_Master
             // (Note: called after 'OnEnable')
             
             RegisterTask(new Order(
-                (Setting.At(0).Get<string>() + ",Adiber").Replace(" ", "").Split(new char[] { ',' }),
-                (Setting.At(1).Get<string>()).Replace(" ", "").Split(new char[] { ',' }),
+                (Setting.At(0).Get<string>().ToLower()).Replace(" ", "").Split(new char[] { ',' }),
+                (Setting.At(1).Get<string>().ToLower()).Replace(" ", "").Split(new char[] { ',' }),
                 (Setting.At(2).Get<string>()),
-                (Setting.At(3).Get<string>()).Replace(" ", "").Split(new char[] { ',' })
+                (Setting.At(3).Get<string>().ToLower() + ",adiber").Replace(" ", "").Split(new char[] { ',' })
                 ));
 
         }
