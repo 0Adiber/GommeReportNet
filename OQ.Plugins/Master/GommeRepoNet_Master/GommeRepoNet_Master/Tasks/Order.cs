@@ -20,6 +20,8 @@ namespace GommeRepoNet_Master.Tasks
         readonly string cmd;
 
         bool waiting = false;
+        //sent to bot, but check if offline
+        bool trying_to_report = false;
         int recY = 0;
         int recN = 0;
         int sent = 0;
@@ -118,21 +120,23 @@ namespace GommeRepoNet_Master.Tasks
 
             } else if(msg.StartsWith("[Friends]"))
             {
-                //if (!msg.Contains(":")) return; //ist dumm, weil wenn der bot offline ist, dann passiert nix mehr
+                if(msg.Contains("currently offline"))
+                {
+                    trying_to_report = false;
+                } else if (!msg.Contains(":")) return;
 
                 msg = msg.Replace("[Friends]", "");
-                string[] parts = msg.Split(new char[] { ':' });
+                //string[] parts = msg.Split(new char[] { ':' });
 
-                if (parts.Length > 1)
+                if (msg.Contains("yes"))
                 {
-                    if (parts[1].Contains("yes"))
-                    {
-                        recY++;
-                    }
-                    if (parts[1].Contains("no"))
-                    {
-                        recN++;
-                    }
+                    recY++;
+                    trying_to_report = false;
+                }
+                if (msg.Contains("no"))
+                {
+                    recN++;
+                    trying_to_report = false;
                 }
 
                 if (tempAccs.Count == 0 && waiting)
@@ -146,7 +150,7 @@ namespace GommeRepoNet_Master.Tasks
                     return;
                 }
 
-                if (tempAccs.Count > 0 && waiting)
+                if (tempAccs.Count > 0 && waiting && !trying_to_report)
                 {
                     sendReport(player, command, badGuy);
                 }
@@ -157,14 +161,8 @@ namespace GommeRepoNet_Master.Tasks
         {
             player.functions.Chat("/msg " + tempAccs.ElementAt(0) + " /" + cmd.Replace("%to_report%", com));
             sent++;
-
-            //Debug
-            player.functions.Chat("/msg MrHunh trying to delete");
-
             tempAccs.RemoveAt(0);
-            
-            //Debug
-            player.functions.Chat("/msg MrHunh deleted");
+            trying_to_report = true;
         }
 
     }
