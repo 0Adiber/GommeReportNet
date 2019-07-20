@@ -20,7 +20,7 @@ namespace GommeRepoNet_Master
             this.Setting.Add(new StringSetting("Bots", "Accounts separated by comma", ""));
                 this.Setting.Add(new StringSetting("Trigger Keywords", "Keywords the bot should react to (e.g. 'report'). (split with comma)", "report"));
                 this.Setting.Add(new StringSetting("Command", "Command the bot should execute when triggered", "report %to_report% hacking confirm"));
-            this.Setting.Add(new StringSetting("Authorised Users", "Users that are allowed to use this Plugin by the Chat command", "Adiber,MrHuhn"));
+            this.Setting.Add(new StringSetting("Authorised Users", "Users that are allowed to use this Plugin by the Chat command", "Adiber,MrHunh"));
 
         }
 

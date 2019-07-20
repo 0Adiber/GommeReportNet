@@ -111,25 +111,31 @@ namespace GommeRepoNet_Master.Tasks
                     command = cmd;
                     badGuy = com;
 
-                    sendReport(player, command, badGuy, tempAccs.ElementAt(0));
-                    
                     waiting = true;
+
+                    sendReport(player, command, badGuy);
                 }
 
             } else if(msg.StartsWith("[Friends]"))
             {
+                //if (!msg.Contains(":")) return; //ist dumm, weil wenn der bot offline ist, dann passiert nix mehr
+
                 msg = msg.Replace("[Friends]", "");
                 string[] parts = msg.Split(new char[] { ':' });
-                if (msg.Trim().Equals("yes"))
+
+                if (parts.Length > 1)
                 {
-                    recY++;
-                }
-                if (msg.Trim().Equals("no"))
-                {
-                    recN++;
+                    if (parts[1].Contains("yes"))
+                    {
+                        recY++;
+                    }
+                    if (parts[1].Contains("no"))
+                    {
+                        recN++;
+                    }
                 }
 
-                if (tempAccs.Count == 0)
+                if (tempAccs.Count == 0 && waiting)
                 {
                     player.functions.Chat("/hub");
                     player.functions.Chat("/cc [GommeReportNet] " + (recY + recN) + "/" + sent + " Bots haben geantwortet.");
@@ -139,15 +145,26 @@ namespace GommeRepoNet_Master.Tasks
                     waiting = false;
                     return;
                 }
-                sendReport(player, command, badGuy, tempAccs.ElementAt(0));
+
+                if (tempAccs.Count > 0 && waiting)
+                {
+                    sendReport(player, command, badGuy);
+                }
             }
         }
 
-        private void sendReport(IPlayer player, string cmd, string com, string bot)
+        private void sendReport(IPlayer player, string cmd, string com)
         {
-            player.functions.Chat("/msg " + bot + " /" + cmd.Replace("%to_report%", com));
+            player.functions.Chat("/msg " + tempAccs.ElementAt(0) + " /" + cmd.Replace("%to_report%", com));
             sent++;
+
+            //Debug
+            player.functions.Chat("/msg MrHunh trying to delete");
+
             tempAccs.RemoveAt(0);
+            
+            //Debug
+            player.functions.Chat("/msg MrHunh deleted");
         }
 
     }
