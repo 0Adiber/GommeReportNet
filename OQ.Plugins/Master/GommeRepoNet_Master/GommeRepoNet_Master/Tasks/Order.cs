@@ -29,8 +29,15 @@ namespace GommeRepoNet_Master.Tasks
         string command;
         string badGuy;
 
+        long last_heard = 0;
+
         List<string> tempAccs = new List<string>();
-        
+
+
+        List<string> accounts_already_responded = new List<string>();
+        string account_to_respond = "";
+
+
         public Order(string[] accounts, string[] keys, string cmd, string[] authorised) {
             this.accounts = accounts.ToList<string>();
             this.keys = keys;
@@ -43,8 +50,8 @@ namespace GommeRepoNet_Master.Tasks
            return true;
         }
 
-        public override void Start() { player.events.onChat += OnChat; }
-        public override void Stop() { player.events.onChat -= OnChat; }
+        public override void Start() { player.events.onChat += OnChat; player.events.onTick += onTick; }
+        public override void Stop() { player.events.onChat -= OnChat; player.events.onTick -= onTick; }
 
         private void OnChat(IPlayer player, IChat message, byte position)
         {
@@ -59,6 +66,15 @@ namespace GommeRepoNet_Master.Tasks
                 string com = null;
                 string sender = "";
 
+                //".report stop" -> stop report process
+                if(parts[1].Trim().ToLower().Split(new char[] { ' '})[1].Equals("stop"))    //kann abstürzen, weil keine überprüfung, ob zwei teile vorhanden
+                {
+                    waiting = false;
+                    trying_to_report = false;
+                    player.functions.Chat("/cc [GommeReportNet] Stopped Report Process.");
+                    return;
+                }
+
                 //check if the reporter is authorised and get the person to report
                 for (int i = 0; i < authorised.Length; i++)
                 {
@@ -67,7 +83,7 @@ namespace GommeRepoNet_Master.Tasks
                     for (int j = 0; j < keys.Length; j++)
                     {
                         if (!parts[1].Trim().ToLower().Contains(keys[j])) continue;
-                        com = parts[1].Trim().ToLower().Split(new char[] { ' ' })[1];
+                        com = parts[1].Trim().ToLower().Split(new char[] { ' ' })[1];   //kann abstürzen, weil keine überprüfung, ob zwei teile vorhanden
                         break;
                     }
                 }
@@ -91,55 +107,45 @@ namespace GommeRepoNet_Master.Tasks
 
                     player.functions.Chat("/clan jump " + sender);
 
-                    Thread.Sleep(2000);//sleep, to make sure he joined the game serve
-
-                    //if (1 == 2)
-                    //{
-                    //    player.functions.Chat("/cc Safe:" + safe.ToString());
-                    //    player.functions.Chat("/cc Current:" + current.ToString());
-
-                    //    player.functions.Chat("/cc [GommeReportNet] Konnte dem Gameserver nicht beitreten :( - Bitte versuche es später erneut.");
-                    //    return;
-                    //}
-
-                    player.functions.Chat("/" + cmd.Replace("%to_report%", com));
-                    sent = 0;
-                    recY = 0;
-                    recN = 0;
-
-                    tempAccs.Clear();
-                    tempAccs = new List<string>(accounts);
+                    Thread.Sleep(2000);//sleep, to make sure he joined the game server
 
                     command = cmd;
                     badGuy = com;
-
                     waiting = true;
-
-                    sendReport(player, command, badGuy);
+                    player.functions.Chat("/" + cmd.Replace("%to_report%", com));
                 }
 
             } else if(msg.StartsWith("[Friends]"))
             {
+                //check if the bot is offline
                 if(msg.Contains("currently offline"))
                 {
                     trying_to_report = false;
                 } else if (!msg.Contains(":")) return;
 
                 msg = msg.Replace("[Friends]", "");
-                //string[] parts = msg.Split(new char[] { ':' });
+                string[] parts = msg.Split(new char[] { ':' });
 
-                if (msg.Contains("yes"))
+                if (parts.Length > 1)   //make sure, that there are two+ parts
                 {
-                    recY++;
-                    trying_to_report = false;
-                }
-                if (msg.Contains("no"))
-                {
-                    recN++;
-                    trying_to_report = false;
+                    if(accounts_already_responded.Contains(parts[0].Trim()))
+                    {
+                        return;
+                    }
+                    if (parts[1].Contains("yes"))
+                    {
+                        recY++;
+                        trying_to_report = false;
+                    }
+                    if (parts[1].Contains("no"))
+                    {
+                        recN++;
+                        trying_to_report = false;
+                    }
                 }
 
-                if (tempAccs.Count == 0 && waiting)
+                //ending
+                if (tempAccs.Count == 0 && waiting && !trying_to_report)
                 {
                     player.functions.Chat("/hub");
                     player.functions.Chat("/cc [GommeReportNet] " + (recY + recN) + "/" + sent + " Bots haben geantwortet.");
@@ -150,19 +156,60 @@ namespace GommeRepoNet_Master.Tasks
                     return;
                 }
 
+                //"loop"
                 if (tempAccs.Count > 0 && waiting && !trying_to_report)
                 {
                     sendReport(player, command, badGuy);
                 }
+            } else if(msg.StartsWith("[Guardian]"))
+            {
+                //check if player is reportable
+                if(msg.Contains("Thank you for your report"))
+                {
+                    startReportProcess(player);
+                }
+                //check if player wanted to report is there
+            } else if(msg.Contains("This player could not be found."))
+            {
+                player.functions.Chat("/cc [GommeReportNet] Stopping Report: <Player not found>");
+                waiting = false;
+                return;
             }
         }
 
         private void sendReport(IPlayer player, string cmd, string com)
         {
             player.functions.Chat("/msg " + tempAccs.ElementAt(0) + " /" + cmd.Replace("%to_report%", com));
+            account_to_respond = tempAccs.ElementAt(0);//we expect a respond from this guy within 20 seconds
+            last_heard = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             sent++;
             tempAccs.RemoveAt(0);
             trying_to_report = true;
+        }
+
+        private void startReportProcess(IPlayer player)
+        {
+            sent = 0;
+            recY = 0;
+            recN = 0;
+
+            tempAccs.Clear();
+            tempAccs = new List<string>(accounts);
+
+            sendReport(player, command, badGuy);
+        }
+
+        private void onTick(IPlayer player)
+        {
+            if(waiting && trying_to_report)
+            {
+                if((last_heard+20000) <= DateTimeOffset.UtcNow.ToUnixTimeMilliseconds())
+                {
+                    trying_to_report = false;
+                    accounts_already_responded.Add(account_to_respond);
+                    sendReport(player, cmd, badGuy);
+                }
+            }
         }
 
     }
