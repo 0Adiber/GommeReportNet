@@ -66,20 +66,21 @@ namespace GommeRepoNet_Master.Tasks
                 string com = null;
                 string sender = "";
 
-                //".report stop" -> stop report process
-                if(parts[1].Trim().ToLower().Split(new char[] { ' '})[1].Equals("stop"))    //kann abstürzen, weil keine überprüfung, ob zwei teile vorhanden
-                {
-                    waiting = false;
-                    trying_to_report = false;
-                    player.functions.Chat("/cc [GommeReportNet] Stopped Report Process.");
-                    return;
-                }
-
                 //check if the reporter is authorised and get the person to report
                 for (int i = 0; i < authorised.Length; i++)
                 {
                     if (!parts[0].ToLower().Contains(authorised[i])) continue;
                     sender = authorised[i];
+
+                    //".report stop" -> stop report process
+                    if (parts[1].Trim().ToLower().Split(new char[] { ' ' })[1].Equals("stop"))    //kann abstürzen, weil keine überprüfung, ob zwei teile vorhanden
+                    {
+                        waiting = false;
+                        trying_to_report = false;
+                        player.functions.Chat("/cc [GommeReportNet] Stopped Report Process.");
+                        return;
+                    }
+
                     for (int j = 0; j < keys.Length; j++)
                     {
                         if (!parts[1].Trim().ToLower().Contains(keys[j])) continue;
