@@ -83,9 +83,14 @@ namespace GommeRepoNet_Master.Tasks
 
                     for (int j = 0; j < keys.Length; j++)
                     {
-                        if (!parts[1].Trim().ToLower().Contains(keys[j])) continue;
-                        com = parts[1].Trim().ToLower().Split(new char[] { ' ' })[1];   //kann abstürzen, weil keine überprüfung, ob zwei teile vorhanden
-                        break;
+                        if (parts[1].Trim().ToLower().Contains(keys[j]))
+                        {
+                            com = parts[1].Trim().ToLower().Split(new char[] { ' ' })[1];   //kann abstürzen, weil keine überprüfung, ob zwei teile vorhanden
+                            break;
+                        } else if(j+1 == keys.Length)
+                        {
+                            return;
+                        }
                     }
                 }
 
@@ -100,7 +105,7 @@ namespace GommeRepoNet_Master.Tasks
                 if (!string.IsNullOrEmpty(com))
                 {
                     //check if someone from the authorised users get reportet
-                    if(authorised.Contains(com))
+                    if(authorised.Contains(com) || player.status.username.ToLower().Equals(com) || accounts.Contains(com))
                     {
                         player.functions.Chat("/cc [GommeReportNet] Nicht cool...");
                         return;
@@ -129,19 +134,20 @@ namespace GommeRepoNet_Master.Tasks
 
                 if (parts.Length > 1)   //make sure, that there are two+ parts
                 {
-                    if(accounts_already_responded.Contains(parts[0].Trim()))
-                    {
-                        return;
-                    }
-                    if (parts[1].Contains("yes"))
-                    {
-                        recY++;
-                        trying_to_report = false;
-                    }
-                    if (parts[1].Contains("no"))
-                    {
-                        recN++;
-                        trying_to_report = false;
+                    if (!(accounts_already_responded.Contains(parts[0].Trim()))) //check if person already responded
+                    { 
+                        if (parts[1].Contains("yes"))
+                        {
+                            recY++;
+                            trying_to_report = false;
+                            accounts_already_responded.Add(parts[0]);
+                        }
+                        if (parts[1].Contains("no"))
+                        {
+                            recN++;
+                            trying_to_report = false;
+                            accounts_already_responded.Add(parts[0]);
+                        }
                     }
                 }
 
@@ -172,7 +178,7 @@ namespace GommeRepoNet_Master.Tasks
                 //check if player wanted to report is there
             } else if(msg.Contains("This player could not be found."))
             {
-                player.functions.Chat("/cc [GommeReportNet] Stopping Report: <Player not found>");
+                player.functions.Chat("/cc [GommeReportNet] Stoppe Report: <Spieler nicht gefunden>");
                 waiting = false;
                 return;
             }
