@@ -72,19 +72,20 @@ namespace GommeRepoNet_Master.Tasks
                     if (!parts[0].ToLower().Contains(authorised[i])) continue;
                     sender = authorised[i];
 
-                    //".report stop" -> stop report process
-                    if (parts[1].Trim().ToLower().Split(new char[] { ' ' })[1].Equals("stop"))    //kann abstürzen, weil keine überprüfung, ob zwei teile vorhanden
-                    {
-                        waiting = false;
-                        trying_to_report = false;
-                        player.functions.Chat("/cc [GommeReportNet] Stopped Report Process.");
-                        return;
-                    }
-
                     for (int j = 0; j < keys.Length; j++)
                     {
                         if (parts[1].Trim().ToLower().Contains(keys[j]))
                         {
+
+                            //".report stop" -> stop report process
+                            if (parts[1].Trim().ToLower().Split(new char[] { ' ' })[1].Equals("stop"))    //kann abstürzen, weil keine überprüfung, ob zwei teile vorhanden
+                            {
+                                waiting = false;
+                                trying_to_report = false;
+                                player.functions.Chat("/cc [GommeReportNet] Stopped Report Process.");
+                                return;
+                            }
+
                             com = parts[1].Trim().ToLower().Split(new char[] { ' ' })[1];   //kann abstürzen, weil keine überprüfung, ob zwei teile vorhanden
                             break;
                         } else if(j+1 == keys.Length)
