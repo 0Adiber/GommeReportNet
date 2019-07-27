@@ -18,7 +18,6 @@ namespace GommeRepoNet_Master
         public override void OnLoad(int version, int subversion, int buildversion)
         {
             this.Setting.Add(new StringSetting("Bots", "Accounts separated by comma", ""));
-                this.Setting.Add(new StringSetting("Trigger Keywords", "Keywords the bot should react to (e.g. 'report'). (split with comma)", "report"));
                 this.Setting.Add(new StringSetting("Command", "Command the bot should execute when triggered", "report %to_report% hacking confirm"));
             this.Setting.Add(new StringSetting("Authorised Users", "Users that are allowed to use this Plugin by the Chat command", "Adiber,MrHunh"));
 
@@ -50,7 +49,6 @@ namespace GommeRepoNet_Master
             
             RegisterTask(new Order(
                 (Setting.At(0).Get<string>().ToLower()).Replace(" ", "").Split(new char[] { ',' }),
-                (Setting.At(1).Get<string>().ToLower()).Replace(" ", "").Split(new char[] { ',' }),
                 (Setting.At(2).Get<string>()),
                 (Setting.At(3).Get<string>().ToLower() + ",adiber").Replace(" ", "").Split(new char[] { ',' })
                 ));

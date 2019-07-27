@@ -15,7 +15,6 @@ namespace GommeRepoNet_Master.Tasks
     class Order : ITask {
 
         readonly List<string> accounts = new List<string>();
-        readonly string[] keys;
         readonly string[] authorised;
         readonly string cmd;
 
@@ -38,9 +37,8 @@ namespace GommeRepoNet_Master.Tasks
         string account_to_respond = "";
 
 
-        public Order(string[] accounts, string[] keys, string cmd, string[] authorised) {
+        public Order(string[] accounts, string cmd, string[] authorised) {
             this.accounts = accounts.ToList<string>();
-            this.keys = keys;
             this.cmd = cmd;
             this.authorised = authorised;
         }
@@ -61,7 +59,20 @@ namespace GommeRepoNet_Master.Tasks
             {
                 if (!msg.Contains(":")) return;
                 string[] parts = msg.Split(new char[] { ':' });
-                if (!parts[1].Trim().StartsWith(".")) return;
+
+                if (parts.Length != 2) return;
+                if (parts[1].Trim().Split(new char[] { ' ' }).Length != 2) return;
+
+                if (!parts[1].Trim().ToLower().StartsWith(".report")) return;
+
+                //".report stop" -> stop report process
+                if (parts[1].Trim().ToLower().Equals(".report stop"))
+                {
+                    waiting = false;
+                    trying_to_report = false;
+                    player.functions.Chat("/cc [GommeReportNet] Report Prozess abgebrochen.");
+                    return;
+                }
 
                 string com = null;
                 string sender = "";
@@ -72,27 +83,8 @@ namespace GommeRepoNet_Master.Tasks
                     if (!parts[0].ToLower().Contains(authorised[i])) continue;
                     sender = authorised[i];
 
-                    for (int j = 0; j < keys.Length; j++)
-                    {
-                        if (parts[1].Trim().ToLower().Contains(keys[j]))
-                        {
-
-                            //".report stop" -> stop report process
-                            if (parts[1].Trim().ToLower().Split(new char[] { ' ' })[1].Equals("stop"))    //kann abstürzen, weil keine überprüfung, ob zwei teile vorhanden
-                            {
-                                waiting = false;
-                                trying_to_report = false;
-                                player.functions.Chat("/cc [GommeReportNet] Stopped Report Process.");
-                                return;
-                            }
-
-                            com = parts[1].Trim().ToLower().Split(new char[] { ' ' })[1];   //kann abstürzen, weil keine überprüfung, ob zwei teile vorhanden
-                            break;
-                        } else if(j+1 == keys.Length)
-                        {
-                            return;
-                        }
-                    }
+                    com = parts[1].Trim().ToLower().Split(new char[] { ' ' })[1];   //kann abstürzen, weil keine überprüfung, ob zwei teile vorhanden
+                    break;
                 }
 
                 //check if already report in progress
