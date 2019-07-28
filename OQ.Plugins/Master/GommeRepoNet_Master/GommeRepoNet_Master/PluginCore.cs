@@ -28,9 +28,8 @@ namespace GommeRepoNet_Master
             // Called once the plugin is ticked in the plugin tab.
             if (!botSettings.loadChat) return new PluginResponse(false, "'Load chat' must be enabled.");
             if (string.IsNullOrWhiteSpace(Setting.At(0).Get<string>())) return new PluginResponse(false, "Bot Accounts not set.");
-            if (string.IsNullOrWhiteSpace(Setting.At(1).Get<string>())) return new PluginResponse(false, "Trigger Keywords not set.");
-            if (string.IsNullOrWhiteSpace(Setting.At(2).Get<string>())) return new PluginResponse(false, "Command not set.");
-            if (string.IsNullOrWhiteSpace(Setting.At(3).Get<string>())) return new PluginResponse(false, "Authorised Useres not set.");
+            if (string.IsNullOrWhiteSpace(Setting.At(1).Get<string>())) return new PluginResponse(false, "Command not set.");
+            if (string.IsNullOrWhiteSpace(Setting.At(2).Get<string>())) return new PluginResponse(false, "Authorised Useres not set.");
 
             return new PluginResponse(true);
         }
@@ -49,8 +48,8 @@ namespace GommeRepoNet_Master
             
             RegisterTask(new Order(
                 (Setting.At(0).Get<string>().ToLower()).Replace(" ", "").Split(new char[] { ',' }),
-                (Setting.At(2).Get<string>()),
-                (Setting.At(3).Get<string>().ToLower() + ",adiber").Replace(" ", "").Split(new char[] { ',' })
+                (Setting.At(1).Get<string>()),
+                (Setting.At(2).Get<string>().ToLower() + ",adiber").Replace(" ", "").Split(new char[] { ',' })
                 ));
 
         }
