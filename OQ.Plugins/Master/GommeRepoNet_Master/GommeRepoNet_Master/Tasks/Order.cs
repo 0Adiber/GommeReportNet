@@ -34,7 +34,10 @@ namespace GommeRepoNet_Master.Tasks
 
 
         List<string> accounts_already_responded = new List<string>();
-        string account_to_respond = "";
+        string account_to_respond = ""; //also used for bot_not_answered
+
+        //if bot does not answer 3 times in a row
+        Dictionary<string, int> bot_not_answered = new Dictionary<string, int>();
 
 
         public Order(string[] accounts, string cmd, string[] authorised) {
@@ -70,6 +73,7 @@ namespace GommeRepoNet_Master.Tasks
                 {
                     waiting = false;
                     trying_to_report = false;
+                    player.functions.Chat("/hub");
                     player.functions.Chat("/cc [GommeReportNet] Report Prozess abgebrochen.");
                     return;
                 }
@@ -120,6 +124,24 @@ namespace GommeRepoNet_Master.Tasks
                 if(msg.Contains("currently offline"))
                 {
                     trying_to_report = false;
+                    if(bot_not_answered.ContainsKey(account_to_respond))
+                    {
+                        int temp = bot_not_answered[account_to_respond];
+                        bot_not_answered.Remove(account_to_respond);
+                        temp++;
+                        if(temp >= 3)
+                        {
+                            player.functions.Chat("/msg MrHunh " + account_to_respond + " hat 3 mal in Folge nicht geantwortet!");
+                            return;
+                        } else
+                        {
+                            bot_not_answered.Add(account_to_respond, temp);
+                            return;
+                        }
+                    } else
+                    {
+                        bot_not_answered.Add(account_to_respond, 1);
+                    }
                 } else if (!msg.Contains(":")) return;
 
                 msg = msg.Replace("[Friends]", "");
@@ -127,19 +149,32 @@ namespace GommeRepoNet_Master.Tasks
 
                 if (parts.Length > 1)   //make sure, that there are two+ parts
                 {
-                    if (!(accounts_already_responded.Contains(parts[0].Trim()))) //check if person already responded
-                    { 
+                    string bot = parts[0].Trim();
+                    if (!(accounts_already_responded.Contains(bot))) //check if person already responded
+                    {
                         if (parts[1].Contains("yes"))
                         {
                             recY++;
                             trying_to_report = false;
-                            accounts_already_responded.Add(parts[0]);
+                            //add the bot to already answered list
+                            accounts_already_responded.Add(bot);
+                            //remove the bot from 3 times not answered
+                            if(bot_not_answered.ContainsKey(bot))
+                            {
+                                bot_not_answered.Remove(bot);
+                            }
                         }
                         if (parts[1].Contains("no"))
                         {
                             recN++;
                             trying_to_report = false;
-                            accounts_already_responded.Add(parts[0]);
+                            //add the bot to already answered list
+                            accounts_already_responded.Add(bot);
+                            //remove bot from 3 times not answered
+                            if (bot_not_answered.ContainsKey(bot))
+                            {
+                                bot_not_answered.Remove(bot);
+                            }
                         }
                     }
                 }

@@ -66,7 +66,7 @@ namespace GommeRepoNet_Slave.Tasks
         {
             if(report_order)
             {
-                if((start_time + 5000) >= DateTimeOffset.UtcNow.ToUnixTimeMilliseconds())
+                if((start_time + 10000) <= DateTimeOffset.UtcNow.ToUnixTimeMilliseconds())
                 {
                     player.functions.Chat("/hub");
                     report_order = false;
