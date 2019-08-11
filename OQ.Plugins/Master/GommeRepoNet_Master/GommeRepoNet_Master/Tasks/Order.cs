@@ -89,6 +89,11 @@ namespace GommeRepoNet_Master.Tasks
 
                 if(lCmd.Equals(".report status"))
                 {
+                    if(waiting != true)
+                    {
+                        player.functions.Chat("/cc [GommeReportNet] Es ist kein Report in Arbeit!");
+                        return;
+                    }
                     player.functions.Chat("/cc [GommeReportNet] Aktuell wird " + badGuy + " reportet.");
                     player.functions.Chat("/cc [GommeReportNet] " + sent + "/" + accounts.Count + " Bots haben bis jetzt geantwortet.");
                     return;
@@ -132,7 +137,6 @@ namespace GommeRepoNet_Master.Tasks
                 for (int i = 0; i < authorised.Length; i++)
                 {
                     if (!parts[0].ToLower().Contains(authorised[i]) && !authorised[i].Equals("*")) continue;
-                    sender = authorised[i];
 
                     com = parts[1].Trim().ToLower().Split(new char[] { ' ' })[1];   //kann abstürzen, weil keine überprüfung, ob zwei teile vorhanden
                     break;
@@ -155,10 +159,15 @@ namespace GommeRepoNet_Master.Tasks
                         return;
                     }
 
+                    //set the sender of message
+                    sender = parts[0].ToLower().Replace("[Clans]", "").Trim();
+
+                    //jump to the sender
                     player.functions.Chat("/clan jump " + sender.Trim());
 
                     Thread.Sleep(2000);//sleep, to make sure he joined the game server
 
+                    //making ready to report
                     command = cmd;
                     badGuy = com;
                     waiting = true;
@@ -205,7 +214,7 @@ namespace GommeRepoNet_Master.Tasks
                         if (parts[1].Contains("yes"))
                         {
                             recY++;
-                            trying_to_report = false;
+                            trying_to_report = false; //to allow master to send report to next bot
                             //add the bot to already answered list
                             accounts_already_responded.Add(bot);
                             //remove the bot from 3 times not answered
@@ -217,7 +226,7 @@ namespace GommeRepoNet_Master.Tasks
                         if (parts[1].Contains("no"))
                         {
                             recN++;
-                            trying_to_report = false;
+                            trying_to_report = false; //to allow master to send report to next bot
                             //add the bot to already answered list
                             accounts_already_responded.Add(bot);
                             //remove bot from 3 times not answered
@@ -238,6 +247,8 @@ namespace GommeRepoNet_Master.Tasks
                     player.functions.Chat("/cc [GommeReportNet] " + recN + "/" + sent + " Bots konnten nicht reporten.");
 
                     waiting = false;
+                    accounts_already_responded.Clear();
+
                     return;
                 }
 
@@ -293,6 +304,7 @@ namespace GommeRepoNet_Master.Tasks
 
         private void onTick(IPlayer player)
         {
+            //if bot does not answer after certain period of time
             if(waiting && trying_to_report)
             {
                 if((last_heard+10000) <= DateTimeOffset.UtcNow.ToUnixTimeMilliseconds())
@@ -301,7 +313,10 @@ namespace GommeRepoNet_Master.Tasks
                     accounts_already_responded.Add(account_to_respond);
                     sendReport(player, cmd, badGuy);
                 }
-            } else if(already_reported_answer_waiting)
+            }
+
+            //for the question if wanna report person who already was reported
+            else if (already_reported_answer_waiting)
             {
                 if((time_already_reported_answer_waiting_asked+10000) <= DateTimeOffset.UtcNow.ToUnixTimeMilliseconds())
                 {
