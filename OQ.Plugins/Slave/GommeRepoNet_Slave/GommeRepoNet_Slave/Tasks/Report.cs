@@ -40,6 +40,12 @@ namespace GommeRepoNet_Slave.Tasks
                 string[] parts = msg.Trim().Split(new char[] { ':' });
                 if (!parts[0].Trim().StartsWith(master)) return;
 
+                if(parts[1].Trim().StartsWith("test"))
+                {
+                    player.functions.Chat("/msg " + master + "test back");
+                    return;
+                }
+
                 player.functions.Chat("/friend jump " + master);
 
                 Thread.Sleep(2000);

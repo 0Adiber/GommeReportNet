@@ -18,12 +18,21 @@ namespace GommeRepoNet_Master.Tasks
         readonly string[] authorised;
         readonly string cmd;
 
+        readonly string manu_acc = "MrHunh";
+
         bool waiting = false;
         //sent to bot, but check if offline
         bool trying_to_report = false;
         int recY = 0;
         int recN = 0;
         int sent = 0;
+
+        //TESTING
+        bool testing_net = false; //indicates wheter network is being tested
+        Dictionary<string, long> testing_results = new Dictionary<string, long>();
+        long testing_time = 0;
+        string current_bot_testing = "";
+        List<string> testing_accounts = new List<string>();
 
         string command;
         string badGuy;
@@ -128,6 +137,45 @@ namespace GommeRepoNet_Master.Tasks
                     return;
                 }
 
+                //or if ".report test" -> test bots and send mrhuhn
+                if(lCmd.Equals(".report test"))
+                {
+                    if(testing_net)
+                    {
+                        player.functions.Chat("/msg " + manu_acc + " [GommeReportNet] Ich teste schon!");
+                        return;
+                    }
+                    testing_net = true;
+                    player.functions.Chat("/msg "+ manu_acc +" [GommeReportNet] Bot-Test gestartet. Max-Response-Time: 10 Sekunden.");
+
+                    testing_accounts = new List<string>(accounts);
+
+                    sendTest(player);
+
+                    while(testing_net)
+                    {
+                        Thread.Sleep(1000);
+                    }
+
+                    //sending it to mrhuhn
+                    string not_answered = "";
+                    foreach (KeyValuePair<string, long> kvp in testing_results)
+                    {
+                        if (kvp.Value.Equals(-1))
+                        {
+                            not_answered += kvp.Value + ",";
+                        }
+                    }
+                    not_answered = String.IsNullOrEmpty(not_answered) ? "0" : not_answered;
+                    player.functions.Chat("/msg " + manu_acc + " " + not_answered + " haben nicht geantwortet!"); //kann abkacken, wenn länge von msg zu lang (idk wie lang maximal seind darf)
+
+                    return;
+                } else if(lCmd.Equals(".report test stop"))
+                {
+                    testing_net = false;
+                    return;
+                }
+
                 string com = null;
                 string sender = "";
 
@@ -190,7 +238,7 @@ namespace GommeRepoNet_Master.Tasks
                         temp++;
                         if(temp >= 3)
                         {
-                            player.functions.Chat("/msg MrHunh " + account_to_respond + " hat 3 mal in Folge nicht geantwortet!");
+                            player.functions.Chat("/msg " +manu_acc + " " + account_to_respond + " hat 3 mal in Folge nicht geantwortet!");
                             return;
                         } else
                         {
@@ -209,6 +257,8 @@ namespace GommeRepoNet_Master.Tasks
                 if (parts.Length > 1)   //make sure, that there are two+ parts
                 {
                     string bot = parts[0].Trim();
+
+                    //yes/no respond
                     if (!(accounts_already_responded.Contains(bot))) //check if person already responded
                     {
                         if (parts[1].Contains("yes"))
@@ -236,21 +286,22 @@ namespace GommeRepoNet_Master.Tasks
                             }
                         }
                     }
+
+                    //test respond
+                    if (parts[1].Contains("test back"))
+                    {
+                        if (current_bot_testing.Equals(bot) && testing_net)
+                        {
+                            testing_results.Add(current_bot_testing, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - testing_time);
+                            testing_accounts.RemoveAt(0);
+                            sendTest(player);
+                        }
+                        return;
+                    }
                 }
 
-                //ending
-                if (tempAccs.Count == 0 && waiting && !trying_to_report)
-                {
-                    player.functions.Chat("/hub");
-                    player.functions.Chat("/cc [GommeReportNet] " + (recY + recN) + "/" + sent + " Bots haben geantwortet.");
-                    player.functions.Chat("/cc [GommeReportNet] " + recY + "/" + sent + " Bots konnten reporten.");
-                    player.functions.Chat("/cc [GommeReportNet] " + recN + "/" + sent + " Bots konnten nicht reporten.");
-
-                    waiting = false;
-                    accounts_already_responded.Clear();
-
-                    return;
-                }
+                //ending of report
+                endingReport(player);
 
                 //"loop"
                 if (tempAccs.Count > 0 && waiting && !trying_to_report)
@@ -302,6 +353,34 @@ namespace GommeRepoNet_Master.Tasks
             sendReport(player, command, badGuy);
         }
 
+        private void sendTest(IPlayer player)
+        {
+            if(testing_accounts.Count == 0)
+            {
+                testing_net = false;
+                return;
+            }
+            testing_time = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            current_bot_testing = testing_accounts.ElementAt(0);
+            player.functions.Chat("/msg " + current_bot_testing + " test");
+        }
+
+        private void endingReport(IPlayer player)
+        {
+            if (tempAccs.Count == 0 && waiting && !trying_to_report)
+            {
+                player.functions.Chat("/hub");
+                player.functions.Chat("/cc [GommeReportNet] " + (recY + recN) + "/" + sent + " Bots haben geantwortet.");
+                player.functions.Chat("/cc [GommeReportNet] " + recY + "/" + sent + " Bots konnten reporten.");
+                player.functions.Chat("/cc [GommeReportNet] " + recN + "/" + sent + " Bots konnten nicht reporten.");
+
+                waiting = false;
+                accounts_already_responded.Clear();
+
+                return;
+            }
+        }
+
         private void onTick(IPlayer player)
         {
             //if bot does not answer after certain period of time
@@ -311,7 +390,14 @@ namespace GommeRepoNet_Master.Tasks
                 {
                     trying_to_report = false;
                     accounts_already_responded.Add(account_to_respond);
-                    sendReport(player, cmd, badGuy);
+
+                    if (tempAccs.Count > 0)
+                    {
+                        sendReport(player, cmd, badGuy);
+                    } else
+                    {
+                        endingReport(player);
+                    }
                 }
             }
 
@@ -323,6 +409,17 @@ namespace GommeRepoNet_Master.Tasks
                     player.functions.Chat("/cc [GommeReportNet] Du hast zu lange zum Antworten gebraucht, deshalb wird jetzt abgebrochen..");
                     player.functions.Chat("/hub");
                     already_reported_answer_waiting = false;
+                }
+            }
+
+            if(testing_net)
+            {
+                if((testing_time + 10000) <= DateTimeOffset.UtcNow.ToUnixTimeMilliseconds())
+                {
+                    testing_results.Add(current_bot_testing, -1);
+                    testing_accounts.RemoveAt(0);
+                    sendTest(player);
+                    return;
                 }
             }
         }
